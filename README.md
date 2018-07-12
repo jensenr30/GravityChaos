@@ -10,11 +10,11 @@ A number of particles are created and kept stationary; these are the targets.
 
 One particle is created that is mobile; this is the projectile.
 
-In the images generated from this program, the targets are displayed as large, color-filled circles. The projectile is not shown in the images directly, but the results of its travels create the image:
-
 The projectile is placed at a certain pixel on the screen, `<x,y>`. The projectile experiences a force exerted upon it by the stationary targets. The code that calculates this force was written to simulate gravity, so it follows the [inverse-square law](https://en.wikipedia.org/wiki/Inverse-square_law). The projectile is accelerated and travels in 2D space. If it hits one of the targets during its travels, the starting point pixel at `<x,y>` is set to the color of the target.
 
 Therefore, the color of each pixel at on the map shows you which target the projectile will hit when the simulation starts with the projectile on that pixel.
+
+The targets are displayed as large, color-filled circles.
 
 If a pixel is black, that indicates the simulation terminated before the projectile hit any target.
 
