@@ -35,7 +35,7 @@ Currently, no user interface exists. As this is just an experimental program, al
 
 
 ## Image Gallery
-Here are some of the more pleasing/interesting results from this particle/gravity simulation program.
+Here are some of my favorite images that this program has generated:
 
 ![Granular Lava Lamp](pics/granular%20lava%20lamp%202%20high%20res.png?raw=true "Granular Lava Lamp")
 
