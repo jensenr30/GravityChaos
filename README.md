@@ -16,18 +16,18 @@ The projectile is placed at a certain pixel on the screen, `<x,y>`. The projecti
 
 Therefore, the color of each pixel on the image indicates which target the projectile will eventually hit.
 
-Each target is rendered as a large, color-filled circle.
-
 If a pixel is black, that indicates the simulation terminated before the projectile hit any target.
+
+Each target is rendered as a large, color-filled circle.
 
 
 ## Chaotic Regions
 
-In some areas of space, small changes in the starting position of the projectile can make it land on different targets. Because of this sensitivity to initial conditions, the image tends to look chaotic in some regions. An example of a chaotic region is the following:
+In some areas of the image, small changes in the starting position of the projectile can make it land on different targets. Because of this sensitivity to initial conditions, the image tends to look chaotic in some regions. An example of a chaotic region is the following:
 
-![chaotic region example](pics/chaotic%20region%20example.png "A Chaotic Region")
+![chaotic region example](pics/chaotic%20region%20example.png?raw=true "A Chaotic Region")
 
-In other regions of the map, its character tends to be very well behaved. This happens when the destination of the projectile is not sensitive to initial conditions.
+In other regions of the map, the terminal location of the projectile is not very sensitive to initial conditions. In these areas, the image does not look chaotic; rather, it appears simple and well-behaved.
 
 
 ## User Interface
