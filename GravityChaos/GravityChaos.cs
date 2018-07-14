@@ -65,7 +65,7 @@ namespace GravityChaos
             {
                 for(int p2 = p1+1; p2 < c; p2++)
                 {
-                    CalculateForcesBetweenTwoParticlesAndSum(Particles, Particles[p1], Particles[p2]);
+                    CalculateForcesBetweenTwoParticlesAndSum(Particles[p1], Particles[p2]);
                 }
             }
 
@@ -92,11 +92,40 @@ namespace GravityChaos
         }
 
 
+
+        //======================================================================
+        // this is meant to update the position of a single particle (called the
+        // Projectile). The projectile is acted upon by a list of particles
+        // called Targets. This function spends much fewer resources on updating
+        // the projectile that the Update() function does.
+        //======================================================================
+        public static void UpdateSingle(Particle Projectile, List<Particle> Targets, double Time)
+        {
+            // initialize the Projectile's forces to 0.
+            Projectile.ForceX = 0;
+            Projectile.ForceY = 0;
+
+            // calculate the net force acting on the Projectile
+            foreach (Particle targ in Targets)
+            {
+                CalculateForcesBetweenTwoParticlesAndSum(Projectile, targ);
+            }
+
+            // calculate the new velocity of the Projectile
+            Projectile.VelocityX += Time * Projectile.ForceX / Projectile.Mass;
+            Projectile.VelocityY += Time * Projectile.ForceY / Projectile.Mass;
+            
+            // calculate the new positions of the Projectile
+            Projectile.PositionX += Time * Projectile.VelocityX;
+            Projectile.PositionY += Time * Projectile.VelocityY;
+        }
+
+
         //======================================================================
         // this calculates the forces between two particles, and adds those
         // forces to the ForceX and ForceY components in both Particle objects.
         //======================================================================
-        public static void CalculateForcesBetweenTwoParticlesAndSum(List<Particle> Particles, Particle p1, Particle p2)
+        public static void CalculateForcesBetweenTwoParticlesAndSum(Particle p1, Particle p2)
         {
             // calculate the distance between the objects squared
             double dist_squared =

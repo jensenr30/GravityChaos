@@ -254,7 +254,9 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.Update(Particles, 30);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 30);
+
+
                         iterations++;
                     }
                     // depending on which target our moving particle hits, color the <x, y> pixel accordingly
