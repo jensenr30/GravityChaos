@@ -81,8 +81,7 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 200;
-            //ImageHeight = 300;
+            ImageHeight = 216;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
@@ -166,11 +165,11 @@ namespace Form1
             
             // "organized mess"
             #region map2
-            ParticleRadius = SpaceHeight / 15.0;
+            ParticleRadius = SpaceHeight / 30.0;
             ParticleMass = Math.Pow(ParticleRadius, 2.0);
 
-            int i_max = 5;
-            int j_max = 3;
+            int i_max = 7;
+            int j_max = 5;
 
             for(int i = 0; i < i_max; i++)
             {
@@ -180,8 +179,8 @@ namespace Form1
                         new Particle
                         {
                             Color = Color.FromArgb(255 * (i_max + j_max - i - j) / (i_max + j_max), 255 * i / i_max, 255 * j / j_max),
-                            PositionX = (i / (double)i_max) * SpaceWidth,
-                            PositionY = (j / (double)j_max) * SpaceHeight,
+                            PositionX = SpaceWidth * 0.5 *(i + 0.5 + (j%2)/2.0) / (double)i_max,
+                            PositionY = SpaceHeight * 0.5 * (j + 0.5) / (double)j_max,
                             Fixed = true,
                             Mass = ParticleMass,
                             Radius = ParticleRadius
@@ -238,7 +237,7 @@ namespace Form1
                     // run the simulation until the moving particle hits one of the stationary particles
                     // have a timeout to prevent the programming from going in an endless loop
                     bool collision = false;
-                    int iterations = 0, iterations_max = 50;
+                    int iterations = 0, iterations_max = 2;
                     while ((!collision) && (iterations < iterations_max))
                     {
                         // check to see if the moving particle has collided with any of the others
@@ -253,7 +252,7 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 30);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 16);
 
 
                         iterations++;
