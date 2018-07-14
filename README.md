@@ -35,9 +35,10 @@ Currently, no user interface exists. As this is just an experimental program, al
 
 
 ## Image Gallery
-Here are some of my favorite images that this program has generated:
+Click on images to view them at full-resolution in a new tab.
 
 ![Granular Lava Lamp](pics/granular%20lava%20lamp%202%20high%20res.png?raw=true "Granular Lava Lamp")
 
+![Ornate Linear Array](pics/ornate%20linear%20array.png?raw=true "Ornate Linear Array")
 
 More images can be found in the [pics](pics/) folder in this repository.
