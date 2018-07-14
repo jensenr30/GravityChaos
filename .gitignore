@@ -1,6 +1,6 @@
-GravityChaos/GravityChaos/bin/*
-GravityChaos/GravityChaos/obj/*
-GravityChaos/.vs/*
+GravityChaos/bin/*
+GravityChaos/obj/*
+.vs/*
 
 *.exe
 *.o
