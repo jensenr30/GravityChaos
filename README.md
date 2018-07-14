@@ -41,4 +41,6 @@ Click on images to view them at full-resolution in a new tab.
 
 ![Ornate Linear Array](pics/ornate%20linear%20array.png?raw=true "Ornate Linear Array")
 
+![Matrix Gradient](pics/matrix%20gradient%20high%20res.png?raw=true "Matrix Gradient")
+
 More images can be found in the [pics](pics/) folder in this repository.
