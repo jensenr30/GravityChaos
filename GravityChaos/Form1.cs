@@ -66,8 +66,6 @@ namespace Form1
 
         public Form1()
         {
-
-            TimeRenderStart = DateTime.Now;
             InitializeComponent();
             this.Particles = new List<Particle> { };
 
@@ -83,7 +81,7 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 40;
+            ImageHeight = 400;
             //ImageHeight = 300;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
@@ -165,6 +163,7 @@ namespace Form1
             //);
             #endregion
 
+            
             // "organized mess"
             #region map2
             ParticleRadius = SpaceHeight / 15.0;
@@ -193,9 +192,9 @@ namespace Form1
 
 
             #endregion
-
-
+            
             this.DoubleBuffered = true;
+            TimeRenderStart = DateTime.Now;
         }
 
 
