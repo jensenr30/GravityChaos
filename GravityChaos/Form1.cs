@@ -19,6 +19,9 @@ namespace Form1
         private List<Particle> Particles;
 
 
+        // this records when the program started
+        DateTime TimeRenderStart;
+
         //------------------------------------------------------------------
         // Define bitmap size for rendering the image of gravity chaos
         //------------------------------------------------------------------
@@ -26,7 +29,7 @@ namespace Form1
         int ImageWidth;
         // create new bitmap to which our image will be printed
         Bitmap Image;
-        // this is the name of the file to which the final image is stored
+        // this is the name of the file to which the final image is stored (e.g. "myImage.png")
         string outputFileName;
         // this lets us know if we need to continue updating the image
         bool imageComplete;
@@ -61,6 +64,8 @@ namespace Form1
 
         public Form1()
         {
+
+            TimeRenderStart = DateTime.Now;
             InitializeComponent();
             this.Particles = new List<Particle> { };
 
@@ -76,13 +81,13 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 2160;
+            ImageHeight = 100;
             //ImageHeight = 300;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
             // where to save final image
-            outputFileName = "output.png";
+            outputFileName = "GravityChaos.png";
             // we need to generate the image
             imageComplete = false;
             // x and y keep track of which pixel we are testing.
@@ -160,11 +165,20 @@ namespace Form1
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            // draw the new position of the particles on the screen
-            //
             e.Graphics.DrawImage(Image, 0, 0);
             Particle.Draw(Particles, e.Graphics);
-            this.Text = "GravityChaos: Drawing... " + (y * 100 / ImageHeight) + "% complete";
+            if (!imageComplete)
+            {
+                string PercentDone = String.Format("{0:0.00}", ((y / (double)ImageHeight) + (x / (double)(ImageHeight * ImageWidth)))*100.0 );
+                this.Text = "GravityChaos: rendering image. " + PercentDone + "% complete...";
+            }
+                
+            else
+            {
+                string TimeRenderTotal = String.Format("{0:0.000}", (DateTime.Now - TimeRenderStart).TotalMilliseconds / 1000.0);
+                this.Text = "GravityChaos: Complete! Total Render Time = " + TimeRenderTotal + " seconds";
+            }
+                
         }
 
 
@@ -225,12 +239,13 @@ namespace Form1
                     // if you have completed the image, close it.
                     if (y >= ImageHeight)
                     {
-
+                        // save the image
                         Image.Save(outputFileName, System.Drawing.Imaging.ImageFormat.Png);
+                        // this indicates we can quit
                         imageComplete = true;
                         try
                         {
-                            SoundPlayer player = new SoundPlayer("gotmail.mp3");
+                            SoundPlayer player = new SoundPlayer("gotmail.wav");
                             player.Play();
                         }
                         catch
@@ -244,7 +259,6 @@ namespace Form1
                 // keep working on the map until you need to refresh the screen again
                 while ((ElapsedTimeMs < this.ScreenRefreshPeriodMs) && !imageComplete);
 
-                // force the screen to be redrawn
                 Invalidate();
             }
         }
