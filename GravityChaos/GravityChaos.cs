@@ -106,9 +106,9 @@ namespace GravityChaos
             Projectile.ForceY = 0;
 
             // calculate the net force acting on the Projectile
-            foreach (Particle targ in Targets)
+            foreach (Particle Target in Targets)
             {
-                CalculateForcesBetweenTwoParticlesAndSum(Projectile, targ);
+                CalculateForcesBetweenTwoParticlesAndSumSingle(Projectile, Target);
             }
 
             // calculate the new velocity of the Projectile
@@ -118,6 +118,47 @@ namespace GravityChaos
             // calculate the new positions of the Projectile
             Projectile.PositionX += Time * Projectile.VelocityX;
             Projectile.PositionY += Time * Projectile.VelocityY;
+        }
+
+
+        //======================================================================
+        // this calculates the forces between two particles, and adds those
+        // forces to the ForceX and ForceY components in ONLY p1.
+        //======================================================================
+        public static void CalculateForcesBetweenTwoParticlesAndSumSingle(Particle projectile, Particle target)
+        {
+            // calculate the distance between the objects squared
+            // Note: writing a manual square-ing function (instead of using Math.Pow() function) provides a ~17% increase in speed!
+            double dist_squared =
+                (projectile.PositionX - target.PositionX) * (projectile.PositionX - target.PositionX) +
+                (projectile.PositionY - target.PositionY) * (projectile.PositionY - target.PositionY);
+
+            double force;
+            // calculate the magnitude of the force normally.
+            // the gravitational constant is left of of this formula (i.e. normalized to 1 for sake of simpler (perhaps slightly faster?) calculations)
+            force = projectile.Mass * target.Mass / dist_squared;
+
+            // calculate the angle (relative to positive x direction, A.K.A. the i unit vector)
+            double angle = Math.Atan2(
+                projectile.PositionY - target.PositionY,
+                projectile.PositionX - target.PositionX);
+
+            // calculate the x- and y-components of the force.
+            double FX = Math.Cos(angle) * force;
+            double FY = Math.Sin(angle) * force;
+
+            // note that this function does not add forces to particle 2.
+            // The reason for this is performance enhancement for the case
+            // where only one particle is moving at a time for the
+            // projectile -target use case.
+            
+            // apply forces to particle 2
+            //p2.ForceX += FX;
+            //p2.ForceY += FY;
+            
+            // forces are equal and opposite on particle 1
+            projectile.ForceX += -FX;
+            projectile.ForceY += -FY;
         }
 
 
@@ -135,7 +176,8 @@ namespace GravityChaos
 
             double force;
             // calculate the magnitude of the force normally.
-            force = Particle.G * p1.Mass * p2.Mass / dist_squared;
+            // the gravitational constant is left of of this formula (i.e. normalized to 1 for sake of simpler (perhaps slightly faster?) calculations)
+            force = p1.Mass * p2.Mass / dist_squared;
 
             // calculate the angle (relative to positive x direction, A.K.A. the i unit vector)
             double angle = Math.Atan2(
