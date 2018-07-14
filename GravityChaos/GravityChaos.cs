@@ -19,10 +19,7 @@ namespace GravityChaos
         public bool   Fixed         { get; set; }   // true/false. A fixed particle does not move.
         public Color  Color         { get; set; }   // the color of the particle.
         private bool DeleteMe       { get; set; }   // indicates whether or not the particle should be removed from the simulation.
-
-
-        // for simplicity, I normalize the gravitational constant to 1.
-        public const double G = 1;
+        
 
         // when you create a new Particle, these are the default values of the member variables.
         public Particle()
