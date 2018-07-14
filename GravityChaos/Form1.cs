@@ -81,7 +81,10 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 216;
+            //ImageHeight = 1080 * 2;    // this is the height of UHD. 2160
+            //ImageHeight = 500;
+            ImageHeight = 1080 * 4;     // double UHD
+
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
@@ -162,36 +165,78 @@ namespace Form1
             //);
             #endregion
 
-            
+
             // "organized mess"
             #region map2
-            ParticleRadius = SpaceHeight / 30.0;
+            //ParticleRadius = SpaceHeight / 30.0;
+            //ParticleMass = Math.Pow(ParticleRadius, 2.0);
+
+            //int i_max = 7;
+            //int j_max = 5;
+
+            //for(int i = 0; i < i_max; i++)
+            //{
+            //    for(int j = 0; j < j_max; j++)
+            //    {
+            //        this.Particles.Add(
+            //            new Particle
+            //            {
+            //                Color = Color.FromArgb(255 * (i_max + j_max - i - j) / (i_max + j_max), 255 * i / i_max, 255 * j / j_max),
+            //                PositionX = SpaceWidth * 0.5 *(i + 0.5 + (j%2)/2.0) / (double)i_max,
+            //                PositionY = SpaceHeight * 0.5 * (j + 0.5) / (double)j_max,
+            //                Fixed = true,
+            //                Mass = ParticleMass,
+            //                Radius = ParticleRadius
+            //            }
+            //        );
+            //    }
+            //}
+
+            #endregion
+
+            // "circular distribution"
+            #region map3
+
+            int t_mod = 3;
+            int t_max = t_mod*2;
+            ParticleRadius = SpaceHeight / (10 * Math.Sqrt(t_max));
             ParticleMass = Math.Pow(ParticleRadius, 2.0);
-
-            int i_max = 7;
-            int j_max = 5;
-
-            for(int i = 0; i < i_max; i++)
+            for (int t = 0; t < t_max; t++)
             {
-                for(int j = 0; j < j_max; j++)
-                {
-                    this.Particles.Add(
-                        new Particle
-                        {
-                            Color = Color.FromArgb(255 * (i_max + j_max - i - j) / (i_max + j_max), 255 * i / i_max, 255 * j / j_max),
-                            PositionX = SpaceWidth * 0.5 *(i + 0.5 + (j%2)/2.0) / (double)i_max,
-                            PositionY = SpaceHeight * 0.5 * (j + 0.5) / (double)j_max,
-                            Fixed = true,
-                            Mass = ParticleMass,
-                            Radius = ParticleRadius
-                        }
-                    );
-                }
+                int a, r, g, b;
+                a = 255;
+                int Level = (int)(28 + (255-28) * Math.Pow((t % t_mod) / (double)(t_mod), 2));
+                r = Level;
+                g = Level;
+                b = Level;
+                this.Particles.Add(
+                    new Particle
+                    {
+                        Color = Color.FromArgb(a, r, g, b),
+                        PositionX = 0.5 * SpaceWidth + SpaceHeight * 0.25 * Math.Cos(2 * Math.PI * t / (double)t_max),
+                        PositionY = 0.5 * SpaceHeight + SpaceHeight * 0.25 * Math.Sin(2 * Math.PI * t / (double)t_max),
+                        Fixed = true,
+                        Mass = ParticleMass,// * (1 + 10 * t / (double)t_max),
+                        Radius = ParticleRadius// * (1 + 10 * t / (double)t_max) / 10
+                    }
+                );
             }
+
+            this.Particles.Add(
+                    new Particle
+                    {
+                        Color = Color.White,
+                        PositionX = 0.5 * SpaceWidth,
+                        PositionY = 0.5 * SpaceHeight,
+                        Fixed = true,
+                        Mass = ParticleMass / 9.0,// * (1 + 10 * t / (double)t_max),
+                        Radius = ParticleRadius * 2.0
+                    }
+                );
 
 
             #endregion
-            
+
             this.DoubleBuffered = true;
             TimeRenderStart = DateTime.Now;
         }
@@ -237,7 +282,7 @@ namespace Form1
                     // run the simulation until the moving particle hits one of the stationary particles
                     // have a timeout to prevent the programming from going in an endless loop
                     bool collision = false;
-                    int iterations = 0, iterations_max = 2;
+                    int iterations = 0, iterations_max = 10;
                     while ((!collision) && (iterations < iterations_max))
                     {
                         // check to see if the moving particle has collided with any of the others
@@ -252,7 +297,7 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 16);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 32);
 
 
                         iterations++;
