@@ -81,7 +81,7 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 100;
+            ImageHeight = 400;
             //ImageHeight = 300;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
@@ -97,22 +97,19 @@ namespace Form1
             y = 0;
             ScreenRefreshPeriodMs = 250;
 
+            
+            //------------------------------------------------------------------
+            // Add one particle that will be the projectile (free to move)
+            //------------------------------------------------------------------
+            this.Particles.Add(new Particle { Color = Color.White, Radius = 0});
+            
 
             //------------------------------------------------------------------
             // Add stationary particles that will act as targets
             //------------------------------------------------------------------
             ParticleRadius = SpaceHeight / 10.0;
             ParticleMass = Math.Pow(ParticleRadius, 2.0);
-
-
-            //------------------------------------------------------------------
-            // Add one particle that will be the projectile (free to move)
-            //------------------------------------------------------------------
-            this.Particles.Add(new Particle { Color = Color.White });
-
-
             
-
             // stationary particle 1
             this.Particles.Add(
                 new Particle
@@ -121,7 +118,8 @@ namespace Form1
                     PositionX = SpaceWidth / 3.0,
                     PositionY = SpaceHeight / 2.0,
                     Fixed = true,
-                    Mass = ParticleMass
+                    Mass = ParticleMass,
+                    Radius = ParticleRadius
                 }
             );
             // stationary particle 2
@@ -132,7 +130,8 @@ namespace Form1
                     PositionX = SpaceWidth * 2.0 / 3.0,
                     PositionY = SpaceHeight / 2.0,
                     Fixed = true,
-                    Mass = ParticleMass
+                    Mass = ParticleMass,
+                    Radius = ParticleRadius
                 }
             );
             // stationary particle 3
@@ -143,7 +142,8 @@ namespace Form1
                     PositionX = SpaceWidth,
                     PositionY = SpaceHeight,
                     Fixed = true,
-                    Mass = ParticleMass*2
+                    Mass = ParticleMass*2,
+                    Radius = ParticleRadius
                 }
             );
             // stationary particle 3
@@ -154,7 +154,8 @@ namespace Form1
                     PositionX = SpaceWidth / 4,
                     PositionY = SpaceHeight / 4,
                     Fixed = true,
-                    Mass = ParticleMass / 2
+                    Mass = ParticleMass / 2,
+                    Radius = ParticleRadius
                 }
             );
 

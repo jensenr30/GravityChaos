@@ -15,9 +15,11 @@ namespace GravityChaos
         public double ForceX        { get; set; }   // newtons (kg * m / s^2)
         public double ForceY        { get; set; }   // newtons (kg * m / s^2)
         public double Mass          { get; set; }   // kilograms
+        public double Radius        { get; set; }   // meters
         public bool   Fixed         { get; set; }   // true/false. A fixed particle does not move.
         public Color  Color         { get; set; }   // the color of the particle.
         private bool DeleteMe       { get; set; }   // indicates whether or not the particle should be removed from the simulation.
+
 
         // for simplicity, I normalize the gravitational constant to 1.
         public const double G = 1;
@@ -32,18 +34,10 @@ namespace GravityChaos
             this.ForceX = 0;
             this.ForceY = 0;
             this.Mass = 1;
+            this.Radius = 100;
             this.Fixed = false;
             this.Color = Color.Lime;
             this.DeleteMe = false;
-        }
-
-
-        //======================================================================
-        // this function returns the radius of the particle
-        //======================================================================
-        public double Radius()
-        {
-            return Math.Sqrt(this.Mass);
         }
 
 
@@ -169,7 +163,7 @@ namespace GravityChaos
                 Math.Pow(p1.PositionY - p2.PositionY, 2);
             // if the distance squared between the two objects is less than or equal to the
             // sum of the squares of the two radii, then the two objects are touching.
-            return (dist_squared <= Math.Pow(p1.Radius() + p2.Radius(), 2));
+            return (dist_squared <= Math.Pow(p1.Radius + p2.Radius, 2));
         }
 
 
@@ -225,23 +219,23 @@ namespace GravityChaos
                 myPen = new Pen(p.Color);
 
                 // draw a circle for the "body" of the particle
-                x = (float)(p.PositionX - p.Radius());
-                y = (float)(p.PositionY - p.Radius());
-                w = (float)(2 * p.Radius());
-                h = (float)(2 * p.Radius());
+                x = (float)(p.PositionX - p.Radius);
+                y = (float)(p.PositionY - p.Radius);
+                w = (float)(2 * p.Radius);
+                h = (float)(2 * p.Radius);
                 screen.DrawEllipse(myPen, x, y, w, h);
 
                 // draw a line showing the direction of the force extered on the particle
                 double force_mag = Math.Sqrt(p.ForceX * p.ForceX + p.ForceY * p.ForceY);
                 double force_x_norm = p.ForceX / force_mag;
                 double force_y_norm = p.ForceY / force_mag;
-                screen.DrawLine(myPen, (float)p.PositionX, (float)p.PositionY, (float)(p.PositionX + 2 * p.Radius() * force_x_norm), (float)(p.PositionY + 2 * p.Radius() * force_y_norm));
+                screen.DrawLine(myPen, (float)p.PositionX, (float)p.PositionY, (float)(p.PositionX + 2 * p.Radius * force_x_norm), (float)(p.PositionY + 2 * p.Radius * force_y_norm));
 
                 // draw a line showing the direction the particle is moving
                 double velocity_mag = Math.Sqrt(p.VelocityX * p.VelocityX + p.VelocityY * p.VelocityY);
                 double velocity_x_norm = p.VelocityX / velocity_mag;
                 double velocity_y_norm = p.VelocityY / velocity_mag;
-                screen.DrawLine(myPen, (float)p.PositionX, (float)p.PositionY, (float)(p.PositionX + p.Radius() * velocity_x_norm), (float)(p.PositionY + p.Radius() * velocity_y_norm));
+                screen.DrawLine(myPen, (float)p.PositionX, (float)p.PositionY, (float)(p.PositionX + p.Radius * velocity_x_norm), (float)(p.PositionY + p.Radius * velocity_y_norm));
 
 
                 myPen.Dispose();
