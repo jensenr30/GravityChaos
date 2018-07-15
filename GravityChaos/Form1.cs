@@ -81,16 +81,14 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            //ImageHeight = 1080 * 2;    // this is the height of UHD. 2160
-            //ImageHeight = 500;
-            ImageHeight = 1080 * 4;     // double UHD
+            ImageHeight = 1080 /2;
 
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
             // where to save final image
-            outputFileName = "GravityChaos.png";
-            // we need to generate the image
+            outputFileName = "render";
+            // we have yet to generate the image, so set this to false.
             imageComplete = false;
             // x and y keep track of which pixel we are testing.
             // The pixels of the screen are evaluated from left to right, then
@@ -348,7 +346,7 @@ namespace Form1
                     // run the simulation until the moving particle hits one of the stationary particles
                     // have a timeout to prevent the programming from going in an endless loop
                     bool collision = false;
-                    int iterations = 0, iterations_max = 300;
+                    int iterations = 0, iterations_max = 4;
                     while ((!collision) && (iterations < iterations_max))
                     {
                         // check to see if the moving particle has collided with any of the others
@@ -363,7 +361,7 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 10.05);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 100);
 
 
                         iterations++;
@@ -385,9 +383,9 @@ namespace Form1
                     // if you have completed the image, close it.
                     if (y >= ImageHeight)
                     {
-                        // save the image
-                        Image.Save(outputFileName, System.Drawing.Imaging.ImageFormat.Png);
-                        // this indicates we can quit
+                        // save the image with date
+                        Image.Save(outputFileName + "_" + (DateTime.Now).ToString("yyyy-MM-ddTHH.mm.ss") + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                        // this indicates we can stop rendering.
                         imageComplete = true;
                         TimeRenderStop = DateTime.Now;
                         try
