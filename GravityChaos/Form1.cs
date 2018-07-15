@@ -363,7 +363,7 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 10);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 10.05);
 
 
                         iterations++;
