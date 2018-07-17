@@ -43,4 +43,8 @@ Click on images to view them at full-resolution in a new tab.
 
 ![Matrix Gradient](pics/matrix%20gradient%20high%20res.png?raw=true "Matrix Gradient")
 
+![Hexagonal Grayscale](pics/hexagonal%20grayscale.png?raw=true "Hexagonal Grayscale")
+
+![snow drift](pics/snow%20drift%20high%20res.png?raw=true "Snow Drift")
+
 More images can be found in the [pics](pics/) folder in this repository.
