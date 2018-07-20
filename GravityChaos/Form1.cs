@@ -19,6 +19,11 @@ namespace Form1
         private List<Particle> Particles;
 
 
+        // this records when the rendering started
+        DateTime TimeRenderStart;
+        // this records when the rendering stopped
+        DateTime TimeRenderStop;
+
         //------------------------------------------------------------------
         // Define bitmap size for rendering the image of gravity chaos
         //------------------------------------------------------------------

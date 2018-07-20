@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Windows.Shapes;
 using System.Drawing;
 
 namespace GravityChaos
@@ -11,7 +10,7 @@ namespace GravityChaos
     // see https://github.com/jensenr30/GravityChaos#how-it-works for an
     // explanation of how GravityChaos images are rendered.
     //======================================================================
-    class GravityChaosConfig
+    class GravityChaosRenderer
     {
         // this is the particle that is placed at different locations and is
         // allowed to move around until it hits a target
@@ -19,7 +18,7 @@ namespace GravityChaos
         // these are the target particles that the projectile can hit during
         // its travels. All targets are stationary for a given render.
         public List<Particle> Targets { get; set; }
-
+        
         // this indicates the maximum number of iterations (simulation steps)
         // that can be performed while rendering any single pixel.
         // e.g. if (for a single pixel at <x,y>) this many steps have been
@@ -38,7 +37,7 @@ namespace GravityChaos
         // the aliasing can easily be identified by the tell-tale rings around
         // each of the five targets.
         public double IterationTimeStep { get; set; }
-
+        
         // this defines the area (in the space of the projectile and targets)
         // that will be rendered.
         // NOTE: the space you choose to render will be
@@ -48,25 +47,97 @@ namespace GravityChaos
         // the aspect ratio may be altered in this transformation. 
         public ParticleSpace SpaceToRender { get; set; }
         // this is how wide the rendered image will be [pixels]
-        public int ImageWidth { get; set; }
+        public int ImageWidth
+        {
+            get
+            {
+                return ImageWidth;
+            }
+            set
+            {
+                if (!IsCurrentlyRendering)
+                    ImageWidth = value;
+                else
+                    throw new Exception("Cannot change ImageWidth! GravityChaosRenderer is currently rendering the image!");
+            }
+        }
         // this is how tall the rendered image will be [pixels]
-        public int ImageHeight { get; set; }
+        public int ImageHeight
+        {
+            get
+            {
+                return ImageHeight;
+            }
+            set
+            {
+                if (!IsCurrentlyRendering)
+                    ImageHeight = value;
+                else
+                    throw new Exception("Cannot change ImageHeight! GravityChaosRenderer is currently rendering the image!");
+            }
+        }
         // this is the bitmap upon which the image will be rendered.
-        public Bitmap Image { get; set; }
+        public Bitmap Image { get; private set; }
         // This is the current pixel being rendered <x,y>
-        public int ImagePixelX { get; set}
-        public int ImagePixelY { get; set}
-
+        private int ImagePixelX { get; set; }
+        private int ImagePixelY { get; set; }
+        
         // this records when the rendering started
-        DateTime TimeRenderStart { get; set; }
+        private DateTime TimeRenderingStarted { get; set; }
         // this records when the rendering stopped
-        DateTime TimeRenderStop { get; set; }
+        private DateTime TimeRenderingStopped { get; set; }
+        // this indicates that the rendering process is currently running
+        public bool IsCurrentlyRendering { get; private set; }
+        
+        // this tells you what percentage of the image has been rendered so far.
+        // yields a number between 0.0 and 100.0.
+        public double PercentComplete
+        {
+            get
+            {
+                return ((ImagePixelY / (double)ImageHeight) + (ImagePixelX / (double)(ImageHeight * ImageWidth))) * 100.0;
+            }
+        }
+        
+        // this returns the total time (milliseconds) that has been used to render the image
+        public int TotalRenderTime
+        {
+            get
+            {
+                if (IsCurrentlyRendering)
+                {
+                    return (int)(DateTime.Now - TimeRenderingStarted).TotalMilliseconds;
+                }
+                else
+                {
+                    return (int)(TimeRenderingStopped - TimeRenderingStarted).TotalMilliseconds;
+                }
+            }
+        }
+
+
+        //======================================================================
+        // convert an X coordinate in image-space to particle-space
+        //======================================================================
+        public double ImageSpaceToParticleSpaceX(int x)
+        {
+            return SpaceToRender.X + x * SpaceToRender.Width/(double)ImageWidth;
+        }
+
+
+        //======================================================================
+        // convert a  Y coordinate in image-space to particle-space
+        //======================================================================
+        public double ImageSpaceToParticleSpaceY(int y)
+        {
+            return SpaceToRender.Y + y * SpaceToRender.Height / (double)ImageHeight;
+        }
 
 
         //======================================================================
         // default values are assigned in constructor
         //======================================================================
-        public GravityChaosConfig()
+        public GravityChaosRenderer()
         {
             Projectile.Mass = 1;
             Projectile.Radius = 0;
@@ -78,6 +149,10 @@ namespace GravityChaos
             SpaceToRender = new ParticleSpace(-50, 50, 50, 50);
             ImageWidth = 480;
             ImageHeight = 270;
+
+            TimeRenderingStarted = DateTime.MinValue;
+            TimeRenderingStopped = DateTime.MinValue;
+            IsCurrentlyRendering = false;
         }
 
         
@@ -85,13 +160,57 @@ namespace GravityChaos
         // this function renders the image using the existing configuration of
         // the properties of this class.
         //======================================================================
-        public Bitmap RenderImage()
+        public Bitmap Render()
         {
 
+            IsCurrentlyRendering = true;
+            Image.Dispose();
+            Image = new Bitmap(ImageWidth, ImageHeight);
+
+            TimeRenderingStarted = DateTime.Now;
+            bool collision;
+            int iterations;
+            for (ImagePixelX = 0; ImagePixelX < ImageWidth; ImagePixelX++)
+            {
+                for (ImagePixelY = 0; ImagePixelY < ImageHeight; ImagePixelY++)
+                {
+                    collision = false;
+                    iterations = 0;
+                    while((!collision) && (iterations < IterationsMax))
+                    {
+                        // TODO: try for instead of foreach to try to get a reduction in render time.
+                        // check to see if the moving particle has hit any of the targets
+                        foreach (Particle p in Targets)
+                        {
+                            collision = Particle.CollisionCheck(Projectile, p);
+                            // if the particle collided, set the pixel to the appropriate color.
+                            if (collision)
+                            {
+                                Image.SetPixel(ImagePixelX, ImagePixelY, p.Color);
+                                break;
+                            }
+                        }
+                        // TODO: try putting an if statement around this, checking if the collision happened. if ther was a collision, we don't have to update the map! we can just quit.
+                        // run the simulation one iteration
+                        Particle.UpdateSingle(Projectile, Targets, IterationTimeStep);
+                        iterations++;
+                    }
+                    // if the Projectile didn't hit any Targets, use default color
+                    // TODO: this can be replaced by initializing the Image to be 100% this default color from the start. it would clean up this loop.
+                    if (!collision)
+                    {
+                        Image.SetPixel(ImagePixelX, ImagePixelY, ColorDefault);
+                    }
+                }
+            }
+
+
+            IsCurrentlyRendering = false;
+            TimeRenderingStopped = DateTime.Now;
             return Image;
         }
-
-
+        
+        
         //======================================================================
         // export the image as a PNG into the render/ subfolder of the program's
         // working directory.
@@ -123,6 +242,8 @@ namespace GravityChaos
     }
 
 
+
+
     //======================================================================
     // defines a rectangular area in particle space
     //======================================================================
@@ -146,8 +267,8 @@ namespace GravityChaos
             Height = height;
         }
     }
-
-
+    
+    
     //======================================================================
     // contains all fields to specify a particle
     // also contains all methods necessary to perform operations on particles
