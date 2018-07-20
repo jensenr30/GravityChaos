@@ -1,53 +1,190 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Windows.Shapes;
 using System.Drawing;
 
 namespace GravityChaos
 {
-    // contains all fields and methods necessary to generate Gravity Chaos maps.
-    class GCMap
+    //======================================================================
+    // contains all properties and methods necessary to render GravityChaos images.
+    // see https://github.com/jensenr30/GravityChaos#how-it-works for an
+    // explanation of how GravityChaos images are rendered.
+    //======================================================================
+    class GravityChaosConfig
     {
-        public Particle projectile;
-        public List<Particle> targets;
-        public double Time;
+        // this is the particle that is placed at different locations and is
+        // allowed to move around until it hits a target
+        public Particle Projectile { get; set; }
+        // these are the target particles that the projectile can hit during
+        // its travels. All targets are stationary for a given render.
+        public List<Particle> Targets { get; set; }
+
+        // this indicates the maximum number of iterations (simulation steps)
+        // that can be performed while rendering any single pixel.
+        // e.g. if (for a single pixel at <x,y>) this many steps have been
+        // calculated and the projectile has still not hit any of the targets,
+        // the simulation will be terminated and the pixel at <x,y> will be
+        // colored the default color.
+        public double IterationsMax { get; set; }
+        // this is the default color. During the rendering process, this color
+        // is used when a particle does not hit any target.
+        public Color ColorDefault { get; set; }
+        // this indicates how big of a step (in time) will be taken for each
+        // iteration of the simulation. The size of a step in space is proportional
+        // to this value. When this is set high, you will get "aliasing". An
+        // example of aliasing can be see in this image:
+        // https://github.com/jensenr30/GravityChaos/raw/master/pics/snow%20drift%20high%20res.png?raw=true
+        // the aliasing can easily be identified by the tell-tale rings around
+        // each of the five targets.
+        public double IterationTimeStep { get; set; }
+
+        // this defines the area (in the space of the projectile and targets)
+        // that will be rendered.
+        // NOTE: the space you choose to render will be
+        // stretched into the Image's Height x Width.
+        // i.e., the space defined by SpaceToRender will be fit into whatever
+        // pixel-space defined by ImageHeight and ImageWidth - by design choice,
+        // the aspect ratio may be altered in this transformation. 
+        public ParticleSpace SpaceToRender { get; set; }
+        // this is how wide the rendered image will be [pixels]
+        public int ImageWidth { get; set; }
+        // this is how tall the rendered image will be [pixels]
+        public int ImageHeight { get; set; }
+        // this is the bitmap upon which the image will be rendered.
+        public Bitmap Image { get; set; }
+        // This is the current pixel being rendered <x,y>
+        public int ImagePixelX { get; set}
+        public int ImagePixelY { get; set}
+
+        // this records when the rendering started
+        DateTime TimeRenderStart { get; set; }
+        // this records when the rendering stopped
+        DateTime TimeRenderStop { get; set; }
+
+
+        //======================================================================
+        // default values are assigned in constructor
+        //======================================================================
+        public GravityChaosConfig()
+        {
+            Projectile.Mass = 1;
+            Projectile.Radius = 0;
+
+            IterationsMax = 4;
+            ColorDefault = Color.Black;
+            IterationTimeStep = 1;
+
+            SpaceToRender = new ParticleSpace(-50, 50, 50, 50);
+            ImageWidth = 480;
+            ImageHeight = 270;
+        }
+
         
+        //======================================================================
+        // this function renders the image using the existing configuration of
+        // the properties of this class.
+        //======================================================================
+        public Bitmap RenderImage()
+        {
+
+            return Image;
+        }
+
+
+        //======================================================================
+        // export the image as a PNG into the render/ subfolder of the program's
+        // working directory.
+        //======================================================================
+        public void ExportImage()
+        {
+            ExportImage("render/" + (DateTime.Now).ToString("yyyy-MM-ddTHH.mm.ss") + ".png");
+        }
+
+
+        //======================================================================
+        // export the bitmap stored in the Image property of this class to the
+        // specified file location.
+        //======================================================================
+        public void ExportImage(string fileName)
+        {
+            ExportImage(fileName, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+
+        //======================================================================
+        // export the bitmap stored in the Image property of this class to the
+        // specified file location, with the specified image format.
+        //======================================================================
+        public void ExportImage(string fileName, System.Drawing.Imaging.ImageFormat imageFormat)
+        {
+            Image.Save(fileName, imageFormat);
+        }
     }
 
 
+    //======================================================================
+    // defines a rectangular area in particle space
+    //======================================================================
+    class ParticleSpace
+    {
+        public double X { get; set; }   // x position
+        public double Y { get; set; }   // y position
+        public double Width { get; set; }   // width of the space
+        public double Height { get; set; }   // height of the space
+
+        public ParticleSpace()
+        {
+
+        }
+
+        public ParticleSpace(double x, double y, double width, double height)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+    }
 
 
-    // contains all fields and methods to specify a particle
+    //======================================================================
+    // contains all fields to specify a particle
+    // also contains all methods necessary to perform operations on particles
+    //======================================================================
     class Particle
     {
-        // define parameters of the particle        // units
-        public double PositionX     { get; set; }   // meters
-        public double PositionY     { get; set; }   // meters
-        public double VelocityX     { get; set; }   // meters / second
-        public double VelocityY     { get; set; }   // meters / second
-        public double ForceX        { get; set; }   // newtons (kg * m / s^2)
-        public double ForceY        { get; set; }   // newtons (kg * m / s^2)
-        public double Mass          { get; set; }   // kilograms
-        public double Radius        { get; set; }   // meters
-        public bool   Fixed         { get; set; }   // true/false. A fixed particle does not move.
-        public Color  Color         { get; set; }   // the color of the particle.
-        private bool DeleteMe       { get; set; }   // indicates whether or not the particle should be removed from the simulation.
-        
+        //======================================================================
+        // define parameters of the particle
+        //======================================================================
+        public double PositionX     { get; set; }
+        public double PositionY     { get; set; }
+        public double VelocityX     { get; set; }
+        public double VelocityY     { get; set; }
+        public double ForceX        { get; set; }
+        public double ForceY        { get; set; }
+        public double Mass          { get; set; }
+        public double Radius        { get; set; }
+        public bool   Fixed         { get; set; }
+        public Color  Color         { get; set; }
 
-        // when you create a new Particle, these are the default values of the member variables.
+
+        //======================================================================
+        // Particle constructor
+        //======================================================================
         public Particle()
         {
-            this.PositionX = 0;
-            this.PositionY = 0;
-            this.VelocityX = 0;
-            this.VelocityY = 0;
-            this.ForceX = 0;
-            this.ForceY = 0;
-            this.Mass = 1;
-            this.Radius = 100;
-            this.Fixed = false;
-            this.Color = Color.Lime;
-            this.DeleteMe = false;
+            // default values of a particle
+            PositionX = 0;
+            PositionY = 0;
+            VelocityX = 0;
+            VelocityY = 0;
+            ForceX = 0;
+            ForceY = 0;
+            Mass = 1;
+            Radius = 100;
+            Fixed = false;
+            Color = Color.Lime;
         }
 
 
@@ -112,7 +249,9 @@ namespace GravityChaos
         }
 
 
+        //======================================================================
         // this function will tell you if two particles are touching
+        //======================================================================
         public static bool CollisionCheck(Particle p1, Particle p2)
         {
             // calculate the distance between the objects squared

@@ -19,11 +19,6 @@ namespace Form1
         private List<Particle> Particles;
 
 
-        // this records when the rendering started
-        DateTime TimeRenderStart;
-        // this records when the rendering stopped
-        DateTime TimeRenderStop;
-
         //------------------------------------------------------------------
         // Define bitmap size for rendering the image of gravity chaos
         //------------------------------------------------------------------
@@ -108,8 +103,7 @@ namespace Form1
             // Add targets (stationary particles that the projectile may hit)
             //------------------------------------------------------------------
 
-            // "granualr lava lamp"
-            #region map1
+            #region map1 - granualr lava lamp
             //ParticleRadius = SpaceHeight / 10.0;
             //ParticleMass = Math.Pow(ParticleRadius, 2.0);
 
@@ -164,8 +158,7 @@ namespace Form1
             #endregion
 
 
-            // "organized mess"
-            #region map2
+            #region map2 - organized mess
             //ParticleRadius = SpaceHeight / 30.0;
             //ParticleMass = Math.Pow(ParticleRadius, 2.0);
 
@@ -192,8 +185,7 @@ namespace Form1
 
             #endregion
 
-            // "hexagonal grayscale"
-            #region map3
+            #region map3 - hexagonal grayscale
 
             //int t_mod = 3;
             //int t_max = t_mod*2;
@@ -235,8 +227,7 @@ namespace Form1
 
 
 
-            // "snow drift"
-            #region map3
+            #region map4 - snow drift
 
             //ParticleRadius = SpaceHeight / 30.0;
             //ParticleMass = Math.Pow(ParticleRadius, 2.0);
@@ -300,7 +291,7 @@ namespace Form1
             // ""
             #endregion
 
-            #region map3
+            #region map5 - test
 
             int t_mod = 12;
             int t_max = t_mod * 1;
