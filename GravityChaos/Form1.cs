@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -31,17 +32,26 @@ namespace Form1
         int ImageWidth;
         // create new bitmap to which our image will be printed
         Bitmap Image;
+        // default color
+        Color ImageDefaultColor;
+        // this is the directory where the output render image file will be saved
+        string OutputFileDirectory;
         // this is the name of the file to which the final image is stored (e.g. "myImage.png")
-        string outputFileName;
+        string OutputFileName;
         // this lets us know if we need to continue updating the image
-        bool imageComplete;
+        bool ImageComplete;
         // x and y keep track of which pixel we are testing.
         // The pixels of the screen are evaluated from left to right, then
         // from top to bottom, like reading a book in english.
         int x;
         int y;
         int ScreenRefreshPeriodMs;
-
+        // this is how much time taken per simulation iteration
+        // (see GravityChaos.GravityChaosRenderer class comments)
+        double IterationTimeStep;
+        // this is how many iterations the test particle goes through before
+        // abandoning the test (see GravityChaos.GravityChaosRenderer class comments)
+        int IterationsMax;
 
         //------------------------------------------------------------------
         // Define space for particles
@@ -59,8 +69,8 @@ namespace Form1
         //------------------------------------------------------------------
         // Add stationary particles that will act as targets
         //------------------------------------------------------------------
-        double ParticleRadius;
-        double ParticleMass;
+        //double ParticleRadius;
+        //double ParticleMass;
 
 
 
@@ -74,22 +84,34 @@ namespace Form1
             // Define space for particles
             //------------------------------------------------------------------
             AspectRatio = 16.0 / 9.0;
-            SpaceHeight = 720;
+            SpaceHeight = 1;
             SpaceWidth = SpaceHeight * AspectRatio;
+
+
+            //------------------------------------------------------------------
+            // define time parameters to be used by the gravity chaos renderer
+            //------------------------------------------------------------------
+            IterationTimeStep = 1;
+            IterationsMax = 4;
 
 
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
+            // size of the image
             ImageHeight = 1080 / 4;
-
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
-            // where to save final image
-            outputFileName = "render";
+            // background color of the rendered image
+            ImageDefaultColor = Color.Black;
+            // folder in which to save the final image
+            OutputFileDirectory = "renders";
+            OutputFileDirectory = PathAddBackslash(OutputFileDirectory);
+            // the name of the final image
+            OutputFileName = "render";
             // we have yet to generate the image, so set this to false.
-            imageComplete = false;
+            ImageComplete = false;
             // x and y keep track of which pixel we are testing.
             // The pixels of the screen are evaluated from left to right, then
             // from top to bottom, like reading a book in english.
@@ -97,7 +119,6 @@ namespace Form1
             y = 0;
             ScreenRefreshPeriodMs = 250;
 
-            
             //------------------------------------------------------------------
             // Add one particle that will be the projectile (free to move)
             //------------------------------------------------------------------
@@ -107,7 +128,6 @@ namespace Form1
             //------------------------------------------------------------------
             // Add targets (stationary particles that the projectile may hit)
             //------------------------------------------------------------------
-
             #region map1 - granualr lava lamp
             //ParticleRadius = SpaceHeight / 10.0;
             //ParticleMass = Math.Pow(ParticleRadius, 2.0);
@@ -161,8 +181,6 @@ namespace Form1
             //    }
             //);
             #endregion
-
-
             #region map2 - organized mess
             //ParticleRadius = SpaceHeight / 30.0;
             //ParticleMass = Math.Pow(ParticleRadius, 2.0);
@@ -189,7 +207,6 @@ namespace Form1
             //}
 
             #endregion
-
             #region map3 - hexagonal grayscale
 
             //int t_mod = 3;
@@ -229,9 +246,6 @@ namespace Form1
             //        }
             //    );
             #endregion
-
-
-
             #region map4 - snow drift
 
             //ParticleRadius = SpaceHeight / 30.0;
@@ -295,33 +309,74 @@ namespace Form1
 
             // ""
             #endregion
-
             #region map5 - test
 
-            int t_mod = 12;
-            int t_max = t_mod * 1;
-            ParticleRadius = SpaceHeight / (100 * Math.Sqrt(t_max));
-            ParticleMass = 50;
-            for (int t = 0; t < t_max; t++)
-            {
-                int a, r, g, b;
-                a = 255;
-                int Level = (int)(28 + (255 - 28) * Math.Pow((t % t_mod) / (double)(t_mod), 2));
-                r = 90;
-                g = 255 - (Level);
-                b = Level;
-                this.Particles.Add(
-                    new Particle
-                    {
-                        Color = Color.FromArgb(a, r, g, b),
-                        PositionX = 0.5 * SpaceWidth - SpaceHeight * 0.25 * (t / (double)t_max) * Math.Cos(3 * Math.PI * t / (double)t_max),
-                        PositionY = 0.3 * SpaceHeight + SpaceHeight * 0.25 * (t / (double)t_max) * Math.Sin(3 * Math.PI * t / (double)t_max),
-                        Fixed = true,
-                        Mass = ParticleMass,// * (1 + 10 * t / (double)t_max),
-                        Radius = ParticleRadius * Math.Sqrt(t + 1)
-                    }
-                );
-            }
+            //int t_mod = 12;
+            //int t_max = t_mod * 1;
+            //ParticleRadius = SpaceHeight / (100 * Math.Sqrt(t_max));
+            //ParticleMass = 50;
+            //for (int t = 0; t < t_max; t++)
+            //{
+            //    int a, r, g, b;
+            //    a = 255;
+            //    int Level = (int)(28 + (255 - 28) * Math.Pow((t % t_mod) / (double)(t_mod), 2));
+            //    r = 90;
+            //    g = 255 - (Level);
+            //    b = Level;
+            //    this.Particles.Add(
+            //        new Particle
+            //        {
+            //            Color = Color.FromArgb(a, r, g, b),
+            //            PositionX = 0.5 * SpaceWidth - SpaceHeight * 0.25 * (t / (double)t_max) * Math.Cos(3 * Math.PI * t / (double)t_max),
+            //            PositionY = 0.3 * SpaceHeight + SpaceHeight * 0.25 * (t / (double)t_max) * Math.Sin(3 * Math.PI * t / (double)t_max),
+            //            Fixed = true,
+            //            Mass = ParticleMass,// * (1 + 10 * t / (double)t_max),
+            //            Radius = ParticleRadius * Math.Sqrt(t + 1)
+            //        }
+            //    );
+            //}
+            #endregion
+
+            #region map6 - used for testing color gradient calculation feature
+
+            double ParticleRadius = SpaceHeight / 5;
+            double ParticleMass = .2;
+            
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 255, 0, 0),
+                    PositionX = SpaceWidth * 1,
+                    PositionY = SpaceHeight * 1 + ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * 1,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 0, 0, 255),
+                    PositionX = SpaceWidth * 0,
+                    PositionY = SpaceHeight * 1 + ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * 2,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 0, 255, 0),
+                    PositionX = SpaceWidth / 2,
+                    PositionY = SpaceHeight * 0 - ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * Math.PI,
+                    Radius = ParticleRadius
+                }
+            );
+
+
             #endregion
 
 
@@ -334,7 +389,7 @@ namespace Form1
         {
             e.Graphics.DrawImage(Image, 0, 0);
             //Particle.Draw(Particles, e.Graphics);
-            if (!imageComplete)
+            if (!ImageComplete)
             {
                 string PercentDone = String.Format("{0:0.00}", ((y / (double)ImageHeight) + (x / (double)(ImageHeight * ImageWidth)))*100.0 );
                 this.Text = "GravityChaos: rendering image. " + PercentDone + "% complete...";
@@ -352,7 +407,7 @@ namespace Form1
         // always get control back to the map-generating routine.
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (!imageComplete)
+            if (!ImageComplete)
             {
                 // record when you entered the loop
                 DateTime TimeOfEntry = DateTime.Now;
@@ -370,8 +425,8 @@ namespace Form1
                     // run the simulation until the moving particle hits one of the stationary particles
                     // have a timeout to prevent the programming from going in an endless loop
                     bool collision = false;
-                    int iterations = 0, iterations_max = 10;
-                    while ((!collision) && (iterations < iterations_max))
+                    int iterations = 0;
+                    while ((!collision) && (iterations < IterationsMax))
                     {
                         // check to see if the moving particle has collided with any of the others
                         foreach (Particle p in Particles.GetRange(1, Particles.Count - 1))
@@ -385,7 +440,7 @@ namespace Form1
                             }
                         }
                         // run the simulation for a little while
-                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1, Particles.Count - 1), 50);
+                        Particle.UpdateSingle(Particles[0], Particles.GetRange(1,Particles.Count-1), IterationTimeStep);
 
 
                         iterations++;
@@ -393,7 +448,7 @@ namespace Form1
                     // depending on which target our moving particle hits, color the <x, y> pixel accordingly
                     if (!collision)
                     {
-                        Image.SetPixel(x, y, Color.Black);
+                        Image.SetPixel(x, y, ImageDefaultColor);
                     }
 
                     // increment x and y
@@ -407,29 +462,67 @@ namespace Form1
                     // if you have completed the image, close it.
                     if (y >= ImageHeight)
                     {
+                        // make a directory if it doesn't exist
+                        Directory.CreateDirectory(OutputFileDirectory);
                         // save the image with date
-                        Image.Save(outputFileName + "_" + (DateTime.Now).ToString("yyyy-MM-ddTHH.mm.ss") + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                        Image.Save(OutputFileDirectory + OutputFileName + "_" + (DateTime.Now).ToString("yyyy-MM-ddTHH.mm.ss") + ".png", System.Drawing.Imaging.ImageFormat.Png);
                         // this indicates we can stop rendering.
-                        imageComplete = true;
+                        ImageComplete = true;
                         TimeRenderStop = DateTime.Now;
-                        try
-                        {
-                            SoundPlayer player = new SoundPlayer("gotmail.wav");
-                            player.Play();
-                        }
-                        catch
-                        {
-                            // oh well.
-                        }
-                        
+                        //try
+                        //{
+                        //    SoundPlayer player = new SoundPlayer("gotmail.wav");
+                        //    player.Play();
+                        //}
+                        //catch
+                        //{
+                        //    // oh well.
+                        //}
                     }
                     ElapsedTimeMs = (int)(DateTime.Now - TimeOfEntry).TotalMilliseconds;
                 }
                 // keep working on the map until you need to refresh the screen again
-                while ((ElapsedTimeMs < this.ScreenRefreshPeriodMs) && !imageComplete);
+                while ((ElapsedTimeMs < this.ScreenRefreshPeriodMs) && !ImageComplete);
 
                 Invalidate();
             }
+        }
+
+
+        private string PathAddBackslash(string path)
+        {
+            // They're always one character but EndsWith is shorter than
+            // array style access to last path character. Change this
+            // if performance are a (measured) issue.
+            string separator1 = "\\";
+            string separator2 = "/";
+
+            // Trailing white spaces are always ignored but folders may have
+            // leading spaces. It's unusual but it may happen. If it's an issue
+            // then just replace TrimEnd() with Trim(). Tnx Paul Groke to point this out.
+            path = path.TrimEnd();
+
+            // Argument is always a directory name then if there is one
+            // of allowed separators then I have nothing to do.
+            if (path.EndsWith(separator1) || path.EndsWith(separator2))
+                return path;
+
+            // If there is the "alt" separator then I add a trailing one.
+            // Note that URI format (file://drive:\path\filename.ext) is
+            // not supported in most .NET I/O functions then we don't support it
+            // here too. If you have to then simply revert this check:
+            // if (path.Contains(separator1))
+            //     return path + separator1;
+            //
+            // return path + separator2;
+            if (path.Contains(separator2))
+                return path + separator2;
+
+            // If there is not an "alt" separator I add a "normal" one.
+            // It means path may be with normal one or it has not any separator
+            // (for example if it's just a directory name). In this case I
+            // default to normal as users expect.
+            return path + separator1;
         }
 
 
