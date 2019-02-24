@@ -8,6 +8,8 @@ The purpose is to generate satisfying images.
 
 ## How it Works
 
+I found the concept for this program in this video: [Chaos, by Rudy Rucker](https://youtu.be/ICrNOTQBS8U?t=217).  Between 3:37 and 5:00, it provides a concise visual explanation of how these images are generated.
+
 A number of particles are created and kept stationary; these are the targets.
 
 One particle is created that is mobile; this is the projectile.
