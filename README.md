@@ -48,3 +48,9 @@ Click on images to view them at full-resolution in a new tab.
 ![snow drift](pics/snow%20drift%20high%20res.png?raw=true "Snow Drift")
 
 More images can be found in the [pics](pics/) folder in this repository.
+
+
+## Videos
+Here are some animations that were created by generating a sequence of images, and using ffmpeg to compile them into a video.
+
+[![Gelatinous Alien Clockwork](https://img.youtube.com/vi/q59parajCWQ/0.jpg)](https://www.youtube.com/watch?v=q59parajCWQ)
