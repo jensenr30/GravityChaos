@@ -99,8 +99,8 @@ namespace Form1
             TargetDefaultVelocityX = 0;
             TargetDefaultVelocityY = 0;
             RotationAngle = Math.PI * 2;
-            RotationSamplePoints = 360;
-            RotationVelocityAmplitude = .07;
+            RotationSamplePoints = 1;
+            RotationVelocityAmplitude = 0;
             RotationVelocityInitialPhase = 0;
             ImageNumber = 0;
 
@@ -120,22 +120,22 @@ namespace Form1
             //------------------------------------------------------------------
             // define time parameters to be used by the gravity chaos renderer
             //------------------------------------------------------------------
-            IterationTimeStep = 2;
-            IterationsMax = 7;
+            IterationTimeStep = .1;
+            IterationsMax = 1;
 
 
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
             // size of the image
-            ImageHeight = 1080 / 1;
+            ImageHeight = 1080 / 4;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
             // background color of the rendered image
             ImageDefaultColor = Color.Black;
             // folder in which to save the final image
-            OutputFileDirectory = "renders";
+            OutputFileDirectory = "D:\\Video\\GravityChaos\\test\\";
             OutputFileDirectory = PathAddBackslash(OutputFileDirectory);
             // the name of the final image
             OutputFileName = "render";
@@ -278,64 +278,64 @@ namespace Form1
             #endregion
             #region map4 - snow drift
 
-            double ParticleRadius = SpaceHeight / 3000.0;
-            double ParticleMass = 1/900.0;
+            //double ParticleRadius = SpaceHeight / 3000.0;
+            //double ParticleMass = 1/900.0;
 
-            this.Particles.Add(
-                new Particle
-                {
-                    Color = Color.Cyan,
-                    PositionX = 0.5 * SpaceWidth,
-                    PositionY = 0.5 * SpaceHeight,
-                    Fixed = true,
-                    Mass = ParticleMass,
-                    Radius = ParticleRadius
-                }
-            );
-            this.Particles.Add(
-                new Particle
-                {
-                    Color = Color.DodgerBlue,
-                    PositionX = 0.9 * SpaceWidth,
-                    PositionY = 0.1 * SpaceHeight,
-                    Fixed = true,
-                    Mass = ParticleMass,
-                    Radius = ParticleRadius
-                }
-            );
-            this.Particles.Add(
-                new Particle
-                {
-                    Color = Color.CornflowerBlue,
-                    PositionX = 0.1 * SpaceWidth,
-                    PositionY = 0.9 * SpaceHeight,
-                    Fixed = true,
-                    Mass = ParticleMass,
-                    Radius = ParticleRadius
-                }
-            );
-            this.Particles.Add(
-                new Particle
-                {
-                    Color = Color.DeepSkyBlue,
-                    PositionX = 0.3 * SpaceWidth,
-                    PositionY = 0.3 * SpaceHeight,
-                    Fixed = true,
-                    Mass = ParticleMass,
-                    Radius = ParticleRadius
-                }
-            );
-            this.Particles.Add(
-                new Particle
-                {
-                    Color = Color.LightBlue,
-                    PositionX = 0.7 * SpaceWidth,
-                    PositionY = 0.7 * SpaceHeight,
-                    Fixed = true,
-                    Mass = ParticleMass,
-                    Radius = ParticleRadius
-                }
-            );
+            //this.Particles.Add(
+            //    new Particle
+            //    {
+            //        Color = Color.Cyan,
+            //        PositionX = 0.5 * SpaceWidth,
+            //        PositionY = 0.5 * SpaceHeight,
+            //        Fixed = true,
+            //        Mass = ParticleMass,
+            //        Radius = ParticleRadius
+            //    }
+            //);
+            //this.Particles.Add(
+            //    new Particle
+            //    {
+            //        Color = Color.DodgerBlue,
+            //        PositionX = 0.9 * SpaceWidth,
+            //        PositionY = 0.1 * SpaceHeight,
+            //        Fixed = true,
+            //        Mass = ParticleMass,
+            //        Radius = ParticleRadius
+            //    }
+            //);
+            //this.Particles.Add(
+            //    new Particle
+            //    {
+            //        Color = Color.CornflowerBlue,
+            //        PositionX = 0.1 * SpaceWidth,
+            //        PositionY = 0.9 * SpaceHeight,
+            //        Fixed = true,
+            //        Mass = ParticleMass,
+            //        Radius = ParticleRadius
+            //    }
+            //);
+            //this.Particles.Add(
+            //    new Particle
+            //    {
+            //        Color = Color.DeepSkyBlue,
+            //        PositionX = 0.3 * SpaceWidth,
+            //        PositionY = 0.3 * SpaceHeight,
+            //        Fixed = true,
+            //        Mass = ParticleMass,
+            //        Radius = ParticleRadius
+            //    }
+            //);
+            //this.Particles.Add(
+            //    new Particle
+            //    {
+            //        Color = Color.LightBlue,
+            //        PositionX = 0.7 * SpaceWidth,
+            //        PositionY = 0.7 * SpaceHeight,
+            //        Fixed = true,
+            //        Mass = ParticleMass,
+            //        Radius = ParticleRadius
+            //    }
+            //);
 
             #endregion
             #region map5 - test
@@ -365,7 +365,6 @@ namespace Form1
             //    );
             //}
             #endregion
-
             #region map6 - used for testing color gradient calculation feature
 
             //double ParticleRadius = SpaceHeight / 5;
@@ -407,7 +406,66 @@ namespace Form1
 
 
             #endregion
+            #region map7 - something new
+            double ParticleRadius = SpaceHeight / 100;
+            double ParticleMass = 0;// .02;
 
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 255, 0, 0),
+                    PositionX = SpaceWidth * 1,
+                    PositionY = SpaceHeight * 1 + ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * 1,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 0, 0, 255),
+                    PositionX = SpaceWidth * 0,
+                    PositionY = SpaceHeight * 1 + ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * 2,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 0, 255, 0),
+                    PositionX = SpaceWidth / 2,
+                    PositionY = SpaceHeight * 0 - ParticleRadius,
+                    Fixed = true,
+                    Mass = ParticleMass * Math.PI,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 0, 255, 255),
+                    PositionX = SpaceWidth * 3 / 4,
+                    PositionY = SpaceHeight * 1 / 3,
+                    Fixed = true,
+                    Mass = ParticleMass * .3,
+                    Radius = ParticleRadius
+                }
+            );
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.FromArgb(255, 255, 255, 0),
+                    PositionX = SpaceWidth / 4,
+                    PositionY = SpaceHeight * 1 / 3,
+                    Fixed = true,
+                    Mass = ParticleMass * .3,
+                    Radius = ParticleRadius
+                }
+            );
+            #endregion
 
             this.DoubleBuffered = true;
             TimeRenderStart = DateTime.Now;
