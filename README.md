@@ -55,6 +55,8 @@ More images can be found in the [pics](pics/) folder in this repository.
 ## Videos
 Here are some animations that were created by generating a sequence of images, and using ffmpeg to compile them into a video.
 
+Click on any of the pictures below to open the video.
+
 [![Gelatinous Alien Clockwork](https://img.youtube.com/vi/q59parajCWQ/0.jpg)](https://www.youtube.com/watch?v=q59parajCWQ)
 
 [![Chameleon](https://img.youtube.com/vi/00W9rgBazVI/0.jpg)](https://www.youtube.com/watch?v=00W9rgBazVI)
